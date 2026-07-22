@@ -1,49 +1,53 @@
 # Warehouse Dispatch System
 
-Sistem monitoring pengiriman gudang berbasis Laravel dan Livewire.
+Aplikasi web internal untuk memusatkan pencatatan dan pemantauan proses pengiriman gudang, mulai dari order masuk sampai pengiriman dinyatakan selesai.
 
-## Menjalankan project lokal
+## Latar Belakang
 
-```powershell
-composer run dev
-```
+Proses pengiriman gudang membutuhkan informasi yang mudah ditelusuri mengenai order yang menunggu, sedang diproses, dan sudah dikirim. Ketika pencatatan masih tersebar pada file Excel atau komunikasi manual, pemantauan status, petugas, jumlah crew, lampiran, dan laporan menjadi lebih sulit dilakukan secara konsisten.
 
-Aplikasi dapat dibuka melalui `http://localhost:8000`.
+Warehouse Dispatch System dirancang sebagai pusat data operasional agar setiap tahapan pengiriman memiliki status, waktu, dan penanggung jawab yang jelas.
 
-## Membagikan public preview
+## Tujuan
 
-Project menyediakan perintah khusus Windows untuk membuat URL publik sementara menggunakan Cloudflare Quick Tunnel.
+- Menyatukan data pengiriman gudang dalam satu sistem.
+- Memantau progres pengiriman berdasarkan status operasional.
+- Mencatat petugas, waktu proses, jumlah crew, dan lampiran pengiriman.
+- Menyediakan dashboard untuk melihat kondisi pengiriman secara ringkas.
+- Menyediakan laporan yang dapat difilter dan digunakan untuk evaluasi operasional.
+- Menjaga riwayat perubahan status agar proses dapat ditelusuri kembali.
 
-Sebelum menjalankan public preview, hentikan `composer run dev` apabila masih aktif agar port Laravel dan Vite development server tidak bentrok.
+## Alur Utama
 
-```powershell
-composer run preview:public
-```
+1. Admin membuat data pengiriman melalui input manual atau import Excel.
+2. Data baru masuk dengan status **Menunggu Antrian**.
+3. Staff Gudang mengambil order dan mengubah status menjadi **Sedang Diproses**.
+4. Staff melengkapi data pengiriman, jumlah crew, keterangan, dan lampiran.
+5. Setelah disubmit, status berubah menjadi **Sudah Dikirim**.
 
-Perintah tersebut akan:
+## Ruang Lingkup Pengembangan
 
-1. memastikan dependency Composer dan frontend tersedia;
-2. menghapus penanda Vite development server (`public/hot`) agar CSS dan JavaScript tidak mengarah ke `localhost:5173`;
-3. membangun asset terbaru menggunakan Vite;
-4. memverifikasi bahwa `public/build/manifest.json` tersedia;
-5. mengunduh `cloudflared.exe` resmi ke folder lokal `.tools` jika belum tersedia;
-6. menjalankan Laravel pada `127.0.0.1:8000` dengan debug dinonaktifkan;
-7. menampilkan URL sementara berbentuk `https://...trycloudflare.com`.
+- Autentikasi dan pembagian hak akses pengguna.
+- Master user, gudang, dan tujuan pengiriman.
+- Input pengiriman secara manual.
+- Import data pengiriman dari Excel.
+- Pengelolaan status pengiriman.
+- Upload lebih dari satu lampiran pengiriman.
+- Dashboard ringkasan status dan intensitas pengiriman.
+- Filter berdasarkan gudang dan rentang tanggal.
+- Export laporan pengiriman.
+- Riwayat perubahan status dan aktivitas pengguna.
 
-Laravel dikonfigurasi untuk mempercayai forwarded host dan protocol dari reverse proxy. Konfigurasi ini diperlukan agar URL CSS, JavaScript, route, dan redirect menggunakan hostname tunnel dan protokol HTTPS, bukan alamat origin lokal.
+## Teknologi
 
-Salin URL yang muncul di terminal dan kirimkan kepada pihak yang akan melihat demo. Terminal harus tetap terbuka selama URL digunakan. Tekan `Ctrl+C` untuk menghentikan preview.
+- PHP 8.3+
+- Laravel 13
+- Livewire 4
+- Tailwind CSS
+- Flux UI
+- MySQL atau MariaDB
+- Vite
 
-Port dapat diganti dengan menjalankan script secara langsung:
+## Status Pengembangan
 
-```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts/share-preview.ps1 -Port 8080
-```
-
-### Batasan public preview
-
-- URL berubah setiap kali tunnel dijalankan kembali.
-- Preview berhenti ketika terminal atau komputer dimatikan.
-- Fitur ini hanya untuk demo dan pengujian, bukan deployment production.
-- Jangan membagikan preview ketika aplikasi telah berisi data rahasia atau akun production.
-- Untuk alamat tetap dan penggunaan berkelanjutan, gunakan server/VPS atau Cloudflare Named Tunnel dengan domain milik Customer.
+Project masih berada dalam tahap pengembangan. Tampilan dashboard dan data pada landing page saat ini digunakan sebagai gambaran alur dan konsep aplikasi sebelum modul transaksi terhubung sepenuhnya dengan database.
