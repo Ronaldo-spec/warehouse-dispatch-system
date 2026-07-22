@@ -14,6 +14,8 @@ Aplikasi dapat dibuka melalui `http://localhost:8000`.
 
 Project menyediakan perintah khusus Windows untuk membuat URL publik sementara menggunakan Cloudflare Quick Tunnel.
 
+Sebelum menjalankan public preview, hentikan `composer run dev` apabila masih aktif agar port Laravel dan Vite development server tidak bentrok.
+
 ```powershell
 composer run preview:public
 ```
@@ -21,10 +23,12 @@ composer run preview:public
 Perintah tersebut akan:
 
 1. memastikan dependency Composer dan frontend tersedia;
-2. membangun asset terbaru menggunakan Vite;
-3. mengunduh `cloudflared.exe` resmi ke folder lokal `.tools` jika belum tersedia;
-4. menjalankan Laravel pada `127.0.0.1:8000` dengan debug dinonaktifkan;
-5. menampilkan URL sementara berbentuk `https://...trycloudflare.com`.
+2. menghapus penanda Vite development server (`public/hot`) agar CSS dan JavaScript tidak mengarah ke `localhost:5173`;
+3. membangun asset terbaru menggunakan Vite;
+4. memverifikasi bahwa `public/build/manifest.json` tersedia;
+5. mengunduh `cloudflared.exe` resmi ke folder lokal `.tools` jika belum tersedia;
+6. menjalankan Laravel pada `127.0.0.1:8000` dengan debug dinonaktifkan;
+7. menampilkan URL sementara berbentuk `https://...trycloudflare.com`.
 
 Salin URL yang muncul di terminal dan kirimkan kepada pihak yang akan melihat demo. Terminal harus tetap terbuka selama URL digunakan. Tekan `Ctrl+C` untuk menghentikan preview.
 
