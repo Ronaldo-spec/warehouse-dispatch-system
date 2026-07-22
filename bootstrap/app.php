@@ -12,7 +12,10 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        //
+        // Public preview and production traffic may arrive through a reverse proxy
+        // such as Cloudflare Tunnel. Trust forwarded host and protocol headers so
+        // Laravel generates HTTPS URLs for Vite assets, routes, and redirects.
+        $middleware->trustProxies(at: '*');
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(
