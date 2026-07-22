@@ -8,9 +8,12 @@ test('landing page can be displayed', function () {
     $response
         ->assertOk()
         ->assertSee('Sistem Monitoring Pengiriman Gudang')
-        ->assertSee('Pantau proses pengiriman gudang dengan lebih terukur.')
+        ->assertSee('Pantau distribusi dengan data yang lebih jelas.')
         ->assertSee('Menunggu Antrian')
         ->assertSee('Sedang Diproses')
         ->assertSee('Sudah Dikirim')
+        ->assertSee('5 Tujuan dengan Pengiriman Terbanyak')
+        ->assertSee('Semua Gudang')
+        ->assertSee('7 Hari Terakhir')
         ->assertSee('Masuk ke Sistem');
 });
