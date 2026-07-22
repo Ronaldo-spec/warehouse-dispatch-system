@@ -33,15 +33,13 @@ if (-not (Test-Path (Join-Path $projectRoot 'vendor/autoload.php'))) {
     composer install
 }
 
-if (-not (Test-Path (Join-Path $projectRoot 'public/build/manifest.json'))) {
-    Write-Host 'Asset production belum tersedia. Menjalankan npm install dan npm run build...' -ForegroundColor Cyan
-
-    if (-not (Test-Path (Join-Path $projectRoot 'node_modules'))) {
-        npm install
-    }
-
-    npm run build
+if (-not (Test-Path (Join-Path $projectRoot 'node_modules'))) {
+    Write-Host 'Dependency frontend belum tersedia. Menjalankan npm install...' -ForegroundColor Cyan
+    npm install
 }
+
+Write-Host 'Membangun asset terbaru untuk public preview...' -ForegroundColor Cyan
+npm run build
 
 $toolsDirectory = Join-Path $projectRoot '.tools'
 $cloudflaredPath = Join-Path $toolsDirectory 'cloudflared.exe'
@@ -52,6 +50,21 @@ if (-not (Test-Path $cloudflaredPath)) {
     $downloadUrl = 'https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-windows-amd64.exe'
     Write-Host 'Mengunduh cloudflared resmi untuk Windows 64-bit...' -ForegroundColor Cyan
     Invoke-WebRequest -Uri $downloadUrl -OutFile $cloudflaredPath
+}
+
+$configCandidates = @(
+    (Join-Path $HOME '.cloudflared/config.yml'),
+    (Join-Path $HOME '.cloudflared/config.yaml')
+)
+
+$existingCloudflaredConfig = $configCandidates | Where-Object { Test-Path $_ } | Select-Object -First 1
+
+if ($existingCloudflaredConfig) {
+    Write-Host ''
+    Write-Warning "Ditemukan konfigurasi cloudflared: $existingCloudflaredConfig"
+    Write-Warning 'Cloudflare Quick Tunnel dapat gagal jika file konfigurasi tersebut aktif.'
+    Write-Warning 'Rename sementara file tersebut apabila tunnel tidak dapat dibuat.'
+    Write-Host ''
 }
 
 Write-Host 'Membersihkan cache konfigurasi Laravel...' -ForegroundColor Cyan
@@ -66,12 +79,15 @@ $serverProcess = $null
 
 try {
     Write-Host "Menjalankan Laravel pada http://127.0.0.1:$Port ..." -ForegroundColor Cyan
-    $serverProcess = Start-Process \
-        -FilePath 'php' \
-        -ArgumentList @('artisan', 'serve', '--host=127.0.0.1', "--port=$Port") \
-        -WorkingDirectory $projectRoot \
-        -NoNewWindow \
-        -PassThru
+
+    $serverArguments = @(
+        'artisan',
+        'serve',
+        '--host=127.0.0.1',
+        "--port=$Port"
+    )
+
+    $serverProcess = Start-Process -FilePath 'php' -ArgumentList $serverArguments -WorkingDirectory $projectRoot -NoNewWindow -PassThru
 
     Start-Sleep -Seconds 2
 
