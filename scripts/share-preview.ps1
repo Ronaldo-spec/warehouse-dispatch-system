@@ -38,8 +38,21 @@ if (-not (Test-Path (Join-Path $projectRoot 'node_modules'))) {
     npm install
 }
 
+$viteHotFile = Join-Path $projectRoot 'public/hot'
+
+if (Test-Path $viteHotFile) {
+    Write-Host 'Menghapus penanda Vite development server agar asset tidak mengarah ke localhost:5173...' -ForegroundColor Cyan
+    Remove-Item $viteHotFile -Force
+}
+
 Write-Host 'Membangun asset terbaru untuk public preview...' -ForegroundColor Cyan
 npm run build
+
+$viteManifest = Join-Path $projectRoot 'public/build/manifest.json'
+
+if (-not (Test-Path $viteManifest)) {
+    throw 'Vite manifest tidak ditemukan setelah build. Periksa output npm run build.'
+}
 
 $toolsDirectory = Join-Path $projectRoot '.tools'
 $cloudflaredPath = Join-Path $toolsDirectory 'cloudflared.exe'
@@ -67,13 +80,15 @@ if ($existingCloudflaredConfig) {
     Write-Host ''
 }
 
-Write-Host 'Membersihkan cache konfigurasi Laravel...' -ForegroundColor Cyan
-php artisan config:clear
+Write-Host 'Membersihkan cache Laravel...' -ForegroundColor Cyan
+php artisan optimize:clear
 
 $previousAppDebug = $env:APP_DEBUG
 $previousAppEnv = $env:APP_ENV
+$previousAssetUrl = $env:ASSET_URL
 $env:APP_DEBUG = 'false'
 $env:APP_ENV = 'local'
+$env:ASSET_URL = ''
 
 $serverProcess = $null
 
@@ -92,7 +107,7 @@ try {
     Start-Sleep -Seconds 2
 
     if ($serverProcess.HasExited) {
-        throw 'Laravel development server gagal dijalankan. Periksa apakah port sedang digunakan.'
+        throw 'Laravel development server gagal dijalankan. Pastikan composer run dev sudah dihentikan dan port tidak sedang digunakan.'
     }
 
     Write-Host ''
@@ -113,4 +128,5 @@ finally {
 
     $env:APP_DEBUG = $previousAppDebug
     $env:APP_ENV = $previousAppEnv
+    $env:ASSET_URL = $previousAssetUrl
 }
