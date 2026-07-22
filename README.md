@@ -30,6 +30,8 @@ Perintah tersebut akan:
 6. menjalankan Laravel pada `127.0.0.1:8000` dengan debug dinonaktifkan;
 7. menampilkan URL sementara berbentuk `https://...trycloudflare.com`.
 
+Laravel dikonfigurasi untuk mempercayai forwarded host dan protocol dari reverse proxy. Konfigurasi ini diperlukan agar URL CSS, JavaScript, route, dan redirect menggunakan hostname tunnel dan protokol HTTPS, bukan alamat origin lokal.
+
 Salin URL yang muncul di terminal dan kirimkan kepada pihak yang akan melihat demo. Terminal harus tetap terbuka selama URL digunakan. Tekan `Ctrl+C` untuk menghentikan preview.
 
 Port dapat diganti dengan menjalankan script secara langsung:
